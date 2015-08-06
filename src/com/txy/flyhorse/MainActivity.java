@@ -37,7 +37,14 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 		v.stopThread();
 	}
-
+	
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		v.stopThread();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

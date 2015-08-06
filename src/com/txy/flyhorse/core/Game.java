@@ -45,10 +45,10 @@ public class Game {
 
 	public boolean gameOver = false;
 	public int winTeam;
-	
-	public int killGeneralNum = 0;  // 单次移动杀子数量
-	public int killFlyNum = 0;  // 单次移动杀子数量
-	
+
+	public int killGeneralNum = 0; // 单次移动杀子数量
+	public int killFlyNum = 0; // 单次移动杀子数量
+
 	public Game() {
 		initBoard();
 	}
@@ -66,14 +66,14 @@ public class Game {
 		board = new Chess[6][4];
 		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j < 4; j++) {
-				 if (i == 0) {
-				 board[i][j] = new Chess(j, i, Chess.GENERAL_HORSE,
-				 Chess.RED_TEAM);
-				 }
-				 if (i == 1 && (j == 0 || j == 3)) {
-				 board[i][j] = new Chess(j, i, Chess.GENERAL_HORSE,
-				 Chess.RED_TEAM);
-				 }
+				if (i == 0) {
+					board[i][j] = new Chess(j, i, Chess.GENERAL_HORSE,
+							Chess.RED_TEAM);
+				}
+				if (i == 1 && (j == 0 || j == 3)) {
+					board[i][j] = new Chess(j, i, Chess.GENERAL_HORSE,
+							Chess.RED_TEAM);
+				}
 
 				if (i == 5) {
 					board[i][j] = new Chess(j, i, Chess.GENERAL_HORSE,
@@ -186,7 +186,7 @@ public class Game {
 		Chess c = this.board[y][x];
 		board[y][x] = null;
 		c.setDeath(true);
-		if (c.getType() == Chess.FLY_HORSE){
+		if (c.getType() == Chess.FLY_HORSE) {
 			killFlyNum++;
 		} else {
 			killGeneralNum++;
@@ -250,16 +250,29 @@ public class Game {
 			if (n1 != null && n2 == null && s1 != null) {
 				if (chess.getTeam() == s1.getTeam()
 						&& n1.getTeam() != chess.getTeam()) {
-					// 杀n1
-					killChess(x, y - 1);
+					if (s2 == null
+							|| (s2.getTeam() != chess.getTeam() && s3 == null)) {
+						// 杀n1
+						killChess(x, y - 1);
+					}
 				}
 			}
+//			n3
+//			n2
+//			n1
+//	  w3w2w1c e1e2e3
+//			s1
+//			s2
+//			s3
 			// 1.2 杀n2
 			if (n1 != null && n3 == null && n2 != null) {
 				if (chess.getTeam() == n1.getTeam()
 						&& n2.getTeam() != chess.getTeam()) {
-					// 杀n2
-					killChess(x, y - 2);
+					if (s1 == null
+							|| (s1.getTeam() != chess.getTeam() && s2 == null)) {
+						// 杀n2
+						killChess(x, y - 2);
+					}
 				}
 			}
 			// 2杀东
@@ -267,16 +280,22 @@ public class Game {
 			if (e1 != null && e2 == null && w1 != null) {
 				if (chess.getTeam() == w1.getTeam()
 						&& e1.getTeam() != chess.getTeam()) {
-					// 杀e1
-					killChess(x + 1, y);
+					if (w2 == null
+							|| (w2.getTeam() != chess.getTeam() && w3 == null)) {
+						// 杀e1
+						killChess(x + 1, y);
+					}
 				}
 			}
 			// 2.2 杀e2
 			if (e1 != null && e3 == null && e2 != null) {
 				if (chess.getTeam() == e1.getTeam()
 						&& e2.getTeam() != chess.getTeam()) {
-					// 杀e2
-					killChess(x + 2, y);
+					if (w1 == null
+							|| (w1.getTeam() != chess.getTeam() && w2 == null)) {
+						// 杀e2
+						killChess(x + 2, y);
+					}
 				}
 			}
 			// 3杀南
@@ -284,16 +303,22 @@ public class Game {
 			if (s1 != null && s2 == null && n1 != null) {
 				if (chess.getTeam() == n1.getTeam()
 						&& s1.getTeam() != chess.getTeam()) {
-					// 杀s1
-					killChess(x, y + 1);
+					if (n2 == null
+							|| (n2.getTeam() != chess.getTeam() && n3 == null)) {
+						// 杀s1
+						killChess(x, y + 1);
+					}
 				}
 			}
 			// 3.2 杀s2
 			if (s1 != null && s3 == null && s2 != null) {
 				if (chess.getTeam() == s1.getTeam()
 						&& s2.getTeam() != chess.getTeam()) {
-					// 杀s2
-					killChess(x, y + 2);
+					if (n1 == null
+							|| (n1.getTeam() != chess.getTeam() && n2 == null)) {
+						// 杀s2
+						killChess(x, y + 2);
+					}
 				}
 			}
 			// 4杀西
@@ -301,22 +326,30 @@ public class Game {
 			if (w1 != null && w2 == null && e1 != null) {
 				if (chess.getTeam() == e1.getTeam()
 						&& w1.getTeam() != chess.getTeam()) {
-					// 杀w1
-					killChess(x - 1, y);
+					if (e2 == null
+							|| (e2.getTeam() != chess.getTeam() && e3 == null)) {
+						// 杀w1
+						killChess(x - 1, y);
+					}
 				}
 			}
 			// 4.2 杀w2
 			if (w1 != null && w3 == null && w2 != null) {
 				if (chess.getTeam() == w1.getTeam()
 						&& w2.getTeam() != chess.getTeam()) {
-					// 杀s2
-					killChess(x - 2, y);
+					if (e1 == null
+							|| (e1.getTeam() != chess.getTeam() && e2 == null)) {
+						// 杀s2
+						killChess(x - 2, y);
+					}
 				}
 			}
-			checkGameOver();
 		}
+
+		checkGameOver();
 		if (this.gameInterface != null && killGeneralNum + killFlyNum != 0) {
-			this.gameInterface.killChess(chess.getTeam(), killGeneralNum, killFlyNum);
+			this.gameInterface.killChess(chess.getTeam(), killGeneralNum,
+					killFlyNum);
 		}
 		this.killGeneralNum = 0;
 		this.killFlyNum = 0;
