@@ -27,24 +27,11 @@ public class Game {
 		FlyHorseGreen = flyHorseGreen;
 	}
 
-	public int getScoreRed() {
-		return scoreRed;
-	}
-
-	public int getScoreGreen() {
-		return scoreGreen;
-	}
-
 	public GameInterface gameInterface;
 
 	private Chess[][] board; // 棋盘
 	public Chess FlyHorseRed;
 	public Chess FlyHorseGreen;
-	private int scoreRed = 0;
-	private int scoreGreen = 0;
-
-	public boolean gameOver = false;
-	public int winTeam;
 
 	public int killGeneralNum = 0; // 单次移动杀子数量
 	public int killFlyNum = 0; // 单次移动杀子数量
@@ -57,9 +44,9 @@ public class Game {
 	 * 初始化棋盘
 	 */
 	private void initBoard() {
-		if (this.board != null) {
-			return;
-		}
+//		if (this.board != null) {
+//			return;
+//		}
 		this.FlyHorseRed = new Chess(-1, -1, Chess.FLY_HORSE, Chess.RED_TEAM);
 		this.FlyHorseGreen = new Chess(-1, -1, Chess.FLY_HORSE,
 				Chess.GREEN_TEAM);
@@ -87,6 +74,10 @@ public class Game {
 		}
 	}
 
+	public void reStartGame() {
+		initBoard();
+	}
+	
 	public boolean moveChess(int sX, int sY, int tX, int tY) {
 		if (this.board == null) {
 			return false;
@@ -165,16 +156,12 @@ public class Game {
 		int gn = this.getTeamChessNum(Chess.GREEN_TEAM);
 		int rn = this.getTeamChessNum(Chess.RED_TEAM);
 		if (gn <= 0) {
-			this.gameOver = true;
-			this.winTeam = Chess.RED_TEAM;
 			if (this.gameInterface != null) {
-				this.gameInterface.gameWin(this.winTeam);
+				this.gameInterface.gameWin(Chess.RED_TEAM);
 			}
 		} else if (rn <= 0) {
-			this.gameOver = true;
-			this.winTeam = Chess.GREEN_TEAM;
 			if (this.gameInterface != null) {
-				this.gameInterface.gameWin(this.winTeam);
+				this.gameInterface.gameWin(Chess.GREEN_TEAM);
 			}
 		}
 	}
@@ -397,6 +384,21 @@ public class Game {
 		return -1;
 	}
 
+	public int getChessTeam(int x, int y) {
+		if (x >= 4 || x < 0 || y >= 6 || y < 0) {
+			return -1;
+		} else {
+			if (this.board == null) {
+				return -1;
+			}
+			Chess c = this.board[y][x];
+			if (c == null) {
+				return -1;
+			}
+			return c.getTeam();
+		}
+	}
+	
 	public Chess[][] getBoard() {
 		return board;
 	}

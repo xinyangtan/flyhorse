@@ -27,6 +27,14 @@ import android.view.MotionEvent;
 
 public class GameView extends BasicView implements GameInterface {
 
+	public boolean isFreeMove() {
+		return freeMove;
+	}
+
+	public void setFreeMove(boolean freeMove) {
+		this.freeMove = freeMove;
+	}
+
 	private Context context;
 
 	private Bitmap mBackground = BitmapFactory.decodeResource(getResources(),
@@ -40,6 +48,8 @@ public class GameView extends BasicView implements GameInterface {
 	private int chessR;
 	private Game game;
 
+	private boolean gameOver = false;
+	private int winTeam;
 	private Point selectChess; // 待移动的子
 	private boolean moveReady; // 是否有子选中
 	private Chess selectFlyHorse;
@@ -49,6 +59,9 @@ public class GameView extends BasicView implements GameInterface {
 	// 得分
 	private int scoreG = 0;
 	private int scoreR = 0;
+
+	private int moveTeam;
+	private boolean freeMove = false;
 
 	public GameView(Context context) {
 		super(context);
@@ -69,6 +82,19 @@ public class GameView extends BasicView implements GameInterface {
 		sound = new Sound(this.context);
 		game = new Game();
 		game.setGameInterface(this);
+
+		if (!freeMove) {
+			initMoveTeam();
+		}
+	}
+
+	private void initMoveTeam() {
+		int t = (int) ((Math.random() * 100) % 2);
+		if (t == 0) {
+			moveTeam = Chess.GREEN_TEAM;
+		} else {
+			moveTeam = Chess.RED_TEAM;
+		}
 	}
 
 	private void initBoardPoints() {
@@ -135,12 +161,12 @@ public class GameView extends BasicView implements GameInterface {
 	}
 
 	private void newGame() {
-		game = new Game();
-		game.setGameInterface(this);
+		game.reStartGame();
+		gameOver = false;
 		this.scoreG = 0;
 		this.scoreR = 0;
 	}
-	
+
 	@Override
 	public void drawOnce(Canvas canvas) {
 		Bitmap resizeBG = Utils.resizeBitmap(mBackground, this.getWidth(),
@@ -156,7 +182,7 @@ public class GameView extends BasicView implements GameInterface {
 		canvas.drawText(
 				("screen height:" + Integer.toString(this.getHeight())), 5, 30,
 				mPaint);
-		
+
 		mPaint.setColor(0x0FE0040BF);
 		mPaint.setTextSize(40);
 		canvas.drawText(("得分" + Integer.toString(scoreR)),
@@ -250,9 +276,9 @@ public class GameView extends BasicView implements GameInterface {
 			drawFlyHorse(game.FlyHorseGreen, FlyHorseGPoint, canvas, chessPaint);
 		}
 
-		if (game.gameOver) {
+		if (gameOver) {
 			String win;
-			if (game.winTeam == Chess.RED_TEAM) {
+			if (winTeam == Chess.RED_TEAM) {
 				win = "白色方胜利！";
 			} else {
 				win = "灰色方胜利！";
@@ -298,6 +324,11 @@ public class GameView extends BasicView implements GameInterface {
 		}
 		game.getFlyHorseGreen().setSelected(false);
 		game.getFlyHorseRed().setSelected(false);
+		selectChess = null;
+		this.moveReady = false;
+		this.backFlyHorse = false;
+		selectFlyHorse = null;
+		this.useFlyHorse = false;
 	}
 
 	private Point getSelectChessPoint(int x, int y) {
@@ -352,7 +383,7 @@ public class GameView extends BasicView implements GameInterface {
 			break;
 		case MotionEvent.ACTION_UP:
 			msg += "UP";
-			if (game.gameOver) {
+			if (gameOver) {
 				Rect touchR = new Rect((this.getWidth() - (50 * 4)) / 2,
 						this.getHeight() / 2,
 						(this.getWidth() - (50 * 4)) / 2 + 50 * 4,
@@ -365,7 +396,7 @@ public class GameView extends BasicView implements GameInterface {
 			Point sP = getSelectChessPoint(x, y);
 			if (sP != null) {
 				Chess sc = game.getBoard()[sP.y][sP.x];
-				if (sc != null) {
+				if (sc != null && (moveTeam == sc.getTeam() || freeMove)) {
 					boolean isChessSelect = sc.isSelected();
 					clearSelectStatus();
 					sc.setSelected(!isChessSelect);
@@ -394,7 +425,7 @@ public class GameView extends BasicView implements GameInterface {
 				}
 			} else {
 				Chess sFH = getSelectFlyHorse(x, y);
-				if (sFH != null) {
+				if (sFH != null && (moveTeam == sFH.getTeam() || freeMove)) {
 					if (this.backFlyHorse) {
 						this.backFlyHorse = false;
 						game.backFlyHorse(selectChess.x, selectChess.y);
@@ -431,11 +462,18 @@ public class GameView extends BasicView implements GameInterface {
 	@Override
 	public void gameWin(int winTeam) {
 		playWinSound();
+		this.winTeam = winTeam;
+		this.gameOver = true;
 	}
 
 	@Override
 	public void moveChess() {
 		playMoveSound();
+		if (!freeMove) {
+			// 移动方转换
+			moveTeam = (moveTeam == Chess.GREEN_TEAM) ? Chess.RED_TEAM
+					: Chess.GREEN_TEAM;
+		}
 	}
 
 	@Override
@@ -458,7 +496,7 @@ public class GameView extends BasicView implements GameInterface {
 		default:
 			break;
 		}
-		if (team == Chess.GREEN_TEAM){
+		if (team == Chess.GREEN_TEAM) {
 			this.scoreG += score;
 		}
 		if (team == Chess.RED_TEAM) {
