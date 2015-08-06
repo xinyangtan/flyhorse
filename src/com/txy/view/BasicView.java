@@ -37,11 +37,11 @@ public class BasicView extends SurfaceView implements SurfaceHolder.Callback {
 
 		// 获得画布
 		Canvas canvas = mHolder.lockCanvas();
-		drawOnce(canvas);
-
-		// 绘制完成后对画布解锁，并刷新到屏幕上
-		mHolder.unlockCanvasAndPost(canvas);
-
+		if (canvas != null) {
+			drawOnce(canvas);
+			// 绘制完成后对画布解锁，并刷新到屏幕上
+			mHolder.unlockCanvasAndPost(canvas);
+		}
 	}
 
 	// 计算物理效果

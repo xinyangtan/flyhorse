@@ -61,7 +61,7 @@ public class GameView extends BasicView implements GameInterface {
 	private int scoreR = 0;
 
 	private int moveTeam;
-	private boolean freeMove = false;
+	private boolean freeMove = true;
 
 	public GameView(Context context) {
 		super(context);
@@ -169,11 +169,13 @@ public class GameView extends BasicView implements GameInterface {
 
 	@Override
 	public void drawOnce(Canvas canvas) {
+//		super.drawOnce(canvas);
+		if (canvas == null) {
+			return;
+		}
 		Bitmap resizeBG = Utils.resizeBitmap(mBackground, this.getWidth(),
 				this.getHeight());
 		canvas.drawBitmap(resizeBG, 0, 0, null);// 画游戏背景
-
-		super.drawOnce(canvas);
 
 		mPaint.setColor(0xFFFFFFFF);
 		mPaint.setTextSize(18);
