@@ -279,13 +279,15 @@ public class GameView extends BasicView implements GameInterface {
 		if (gameOver) {
 			String win;
 			if (winTeam == Chess.RED_TEAM) {
-				win = "白色方胜利！";
+				win = "白色方胜利";
+			} else if (winTeam == Chess.GREEN_TEAM) {
+				win = "灰色方胜利";
 			} else {
-				win = "灰色方胜利！";
+				win = "和局";
 			}
 			mPaint.setTextSize(50);
 			mPaint.setColor(Color.YELLOW);
-			canvas.drawText(win, (this.getWidth() - (50 * 5)) / 2,
+			canvas.drawText(win, (this.getWidth() - (50 * win.length())) / 2,
 					this.getHeight() / 2, mPaint);
 			canvas.drawText("重新开始", (this.getWidth() - (50 * 5)) / 2,
 					this.getHeight() / 2 + 70, mPaint);
@@ -463,6 +465,14 @@ public class GameView extends BasicView implements GameInterface {
 	public void gameWin(int winTeam) {
 		playWinSound();
 		this.winTeam = winTeam;
+		// 和局判定
+		if (winTeam != Chess.RED_TEAM && winTeam != Chess.GREEN_TEAM) {
+			if (this.scoreG > this.scoreR) {
+				this.winTeam = Chess.GREEN_TEAM;
+			} else if (this.scoreG < this.scoreR) {
+				this.winTeam = Chess.RED_TEAM;
+			}
+		}
 		this.gameOver = true;
 	}
 
